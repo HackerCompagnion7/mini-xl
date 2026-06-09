@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mini-xl"
+version = "2.0.0"
+description = "Lightweight CLI — Convert CSV, TSV, JSON, TXT to professional Excel (.xlsx)"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "HackerCompagnion7" },
+]
+keywords = ["excel", "xlsx", "csv", "tsv", "json", "converter", "cli", "termux"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: POSIX",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business :: Financial :: Spreadsheet",
+    "Topic :: Utilities",
+]
+
+dependencies = [
+    "openpyxl>=3.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pyflakes>=3.0",
+    "build>=0.10",
+]
+
+[project.scripts]
+mini-xl = "mini_xl.main:main"
+
+[project.urls]
+Homepage = "https://github.com/HackerCompagnion7/mini-xl"
+Repository = "https://github.com/HackerCompagnion7/mini-xl"
+Issues = "https://github.com/HackerCompagnion7/mini-xl/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+mini_xl = ["py.typed"]

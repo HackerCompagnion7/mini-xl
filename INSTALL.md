@@ -12,23 +12,31 @@
 
 ## Table of Contents
 
-- [Requirements](#requirements)
+- [Quick Install](#quick-install)
 - [Termux (Android)](#termux-android)
 - [Linux (Debian/Ubuntu)](#linux-debianubuntu)
 - [Linux (Arch)](#linux-arch)
 - [macOS](#macos)
+- [From Source](#from-source)
+- [From Wheel](#from-wheel)
 - [Verification](#verification)
 - [Troubleshooting](#troubleshooting)
 
 ---
 
-## Requirements
+## Quick Install
 
-| Requirement | Minimum Version |
-|-------------|----------------|
-| Python | 3.10+ |
-| pip | Latest |
-| Disk space | ~5 MB (project + openpyxl) |
+The fastest way to install MINI-XL:
+
+```bash
+pip install git+https://github.com/HackerCompagnion7/mini-xl.git
+```
+
+After installation, the `mini-xl` command is available everywhere:
+
+```bash
+mini-xl
+```
 
 ---
 
@@ -69,51 +77,25 @@ This creates the `~/storage/downloads` directory that MINI-XL scans by default. 
 
 > If the dialog doesn't appear, go to **Settings → Apps → Termux → Permissions → Storage** and enable it.
 
-### Step 5 — Clone MINI-XL
+### Step 5 — Install MINI-XL
 
 ```bash
-cd ~/storage/downloads
-git clone https://github.com/HackerCompagnion7/mini-xl.git
-cd mini-xl
+pip install git+https://github.com/HackerCompagnion7/mini-xl.git
 ```
 
-### Step 6 — Install Dependencies
+### Step 6 — Run
 
 ```bash
-pip install openpyxl
-```
-
-Or use the Makefile:
-
-```bash
-make setup
-```
-
-### Step 7 — Run
-
-```bash
-python main.py
-```
-
-Or:
-
-```bash
-make run
+mini-xl
 ```
 
 ### Optional — Add to PATH
 
-To run `mini-xl` from anywhere:
+If the `mini-xl` command is not found, add the pip bin directory to your PATH:
 
 ```bash
-echo 'alias mini-xl="python ~/storage/downloads/mini-xl/main.py"' >> ~/.bashrc
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
-```
-
-Then simply type:
-
-```bash
-mini-xl
 ```
 
 ---
@@ -127,33 +109,20 @@ sudo apt update
 sudo apt install python3 python3-pip -y
 ```
 
-### Step 2 — Clone MINI-XL
+### Step 2 — Install MINI-XL
 
 ```bash
-git clone https://github.com/HackerCompagnion7/mini-xl.git
-cd mini-xl
-```
-
-### Step 3 — Install Dependencies
-
-```bash
-pip3 install openpyxl
-```
-
-Or with the Makefile:
-
-```bash
-make setup
+pip3 install git+https://github.com/HackerCompagnion7/mini-xl.git
 ```
 
 > If pip warns about externally-managed environment, use:
 > ```bash
-> pip3 install --user openpyxl
+> pip3 install --user git+https://github.com/HackerCompagnion7/mini-xl.git
 > # or
-> pip3 install openpyxl --break-system-packages
+> pip3 install git+https://github.com/HackerCompagnion7/mini-xl.git --break-system-packages
 > ```
 
-### Step 4 — Create Downloads Directory
+### Step 3 — Create Downloads Directory
 
 By default, MINI-XL scans `~/storage/downloads`. Create it if it doesn't exist:
 
@@ -161,19 +130,10 @@ By default, MINI-XL scans `~/storage/downloads`. Create it if it doesn't exist:
 mkdir -p ~/storage/downloads
 ```
 
-Or set a custom directory (see [Custom Directory](#custom-directory)).
-
-### Step 5 — Run
+### Step 4 — Run
 
 ```bash
-python3 main.py
-```
-
-### Optional — System-wide Alias
-
-```bash
-echo 'alias mini-xl="python3 /path/to/mini-xl/main.py"' >> ~/.bashrc
-source ~/.bashrc
+mini-xl
 ```
 
 ---
@@ -186,18 +146,16 @@ source ~/.bashrc
 sudo pacman -Syu python python-pip
 ```
 
-### Step 2 — Clone & Install
+### Step 2 — Install MINI-XL
 
 ```bash
-git clone https://github.com/HackerCompagnion7/mini-xl.git
-cd mini-xl
-pip install openpyxl
+pip install git+https://github.com/HackerCompagnion7/mini-xl.git
 ```
 
 ### Step 3 — Run
 
 ```bash
-python main.py
+mini-xl
 ```
 
 ---
@@ -210,12 +168,10 @@ python main.py
 brew install python
 ```
 
-### Step 2 — Clone & Install
+### Step 2 — Install MINI-XL
 
 ```bash
-git clone https://github.com/HackerCompagnion7/mini-xl.git
-cd mini-xl
-pip3 install openpyxl
+pip3 install git+https://github.com/HackerCompagnion7/mini-xl.git
 ```
 
 ### Step 3 — Create Downloads Directory
@@ -227,7 +183,41 @@ mkdir -p ~/storage/downloads
 ### Step 4 — Run
 
 ```bash
-python3 main.py
+mini-xl
+```
+
+---
+
+## From Source
+
+For development or customization:
+
+```bash
+git clone https://github.com/HackerCompagnion7/mini-xl.git
+cd mini-xl
+
+# Install in editable mode (changes are live)
+pip install -e .
+
+# Or install normally
+pip install .
+```
+
+Build from source using the Makefile:
+
+```bash
+make setup      # install editable + verify
+make build      # build .whl and .tar.gz
+```
+
+---
+
+## From Wheel
+
+If you have a `.whl` file:
+
+```bash
+pip install mini_xl-2.0.0-py3-none-any.whl
 ```
 
 ---
@@ -237,26 +227,16 @@ python3 main.py
 After installation, verify everything works:
 
 ```bash
-make check
-```
+# Check package is installed
+pip show mini-xl
 
-This runs:
-1. **Compilation check** — All modules compile without errors
-2. **Lint check** — Static analysis passes
-3. **Test suite** — All 34 automated tests pass
+# Check CLI is available
+which mini-xl
 
-Expected output:
-
-```
-  ✔ utils.py
-  ✔ scanner.py
-  ✔ menu.py
-  ✔ analyseur.py
-  ✔ generateur.py
-  ✔ main.py
-  Compilation OK ✔
-
-  Results: 34/34 passed, 0 failed
+# Run test suite
+git clone https://github.com/HackerCompagnion7/mini-xl.git
+cd mini-xl
+python3 tests/test_mini_xl.py
 ```
 
 ### Quick Smoke Test
@@ -264,43 +244,49 @@ Expected output:
 Create a test CSV file and convert it:
 
 ```bash
+mkdir -p ~/storage/downloads
 echo "name,age,city" > ~/storage/downloads/test.csv
 echo "Alice,30,NYC" >> ~/storage/downloads/test.csv
 echo "Bob,25,LA" >> ~/storage/downloads/test.csv
 
-python3 main.py
+mini-xl
 # Select [1] test.csv
 # Check the generated .xlsx file
 ```
 
 ---
 
-## Custom Directory
+## Troubleshooting
 
-MINI-XL defaults to `~/storage/downloads`. To use a custom directory:
+### `mini-xl: command not found`
 
-Edit `utils.py` and change `REP_DOWNLOADS`:
-
-```python
-REP_DOWNLOADS: str = "/your/custom/path"
-```
-
-Or create a symlink:
+The pip bin directory is not in your PATH:
 
 ```bash
-ln -s /your/custom/path ~/storage/downloads
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
 ```
 
----
+Or run via Python:
 
-## Troubleshooting
+```bash
+python3 -m mini_xl
+```
+
+### `No module named 'mini_xl'`
+
+Reinstall the package:
+
+```bash
+pip install git+https://github.com/HackerCompagnion7/mini-xl.git
+```
 
 ### `No module named 'openpyxl'`
 
+This should be installed automatically as a dependency. If not:
+
 ```bash
 pip install openpyxl
-# or
-pip3 install openpyxl --user
 ```
 
 ### `Permission denied` when writing
@@ -361,6 +347,16 @@ This is **not** supported:
 ### Large files are slow
 
 Files over 100 MB will trigger a warning. For best performance, keep files under 100 MB.
+
+---
+
+## Uninstall
+
+To remove MINI-XL:
+
+```bash
+pip uninstall mini-xl
+```
 
 ---
 

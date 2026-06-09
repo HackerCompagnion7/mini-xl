@@ -9,11 +9,12 @@
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![Termux](https://img.shields.io/badge/Termux-Compatible-000000?style=flat-square&logo=android&logoColor=white)](https://termux.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-34%2F34%20PASS-brightgreen?style=flat-square)](test_mini_xl.py)
+[![PyPI](https://img.shields.io/badge/PyPI-2.0.0-blue?style=flat-square&logo=pypi&logoColor=white)](https://pypi.org/project/mini-xl/)
+[![Tests](https://img.shields.io/badge/Tests-30%2F30%20PASS-brightgreen?style=flat-square)](tests/test_mini_xl.py)
 
 *Convert CSV, TSV, JSON and structured TXT into formatted `.xlsx` files — instantly.*
 
-[Getting Started](#getting-started) • [Installation](INSTALL.md) • [Usage](#usage) • [Architecture](#architecture) • [Makefile](#makefile-commands)
+[Getting Started](#getting-started) • [Installation](#installation) • [Usage](#usage) • [Architecture](#architecture) • [Makefile](#makefile-commands)
 
 </div>
 
@@ -48,40 +49,57 @@ MINI-XL is a zero-bloat, terminal-first utility designed for **Termux on Android
   - Automatic numeric type conversion (int/float)
 - **Timestamped filenames** — `rapport_ventes_20260608_154530.xlsx`
 - **Lightweight** — Single dependency (`openpyxl`), under 850 total lines of code
+- **Installable package** — `pip install mini-xl` and run from anywhere
 - **Error handling** — Empty files, invalid JSON, permission errors, oversized files
 - **Logging** — Full operation log at `~/storage/downloads/mini-xl.log`
 
 ---
 
-## Getting Started
+## Installation
 
-### Prerequisites
-
-- Python 3.10 or higher
-- pip (Python package manager)
-- Termux (Android) or any Linux terminal
-
-### Quick Install
+### From GitHub (Recommended)
 
 ```bash
-# Clone the repository
-git clone https://github.com/HackerCompagnion7/mini-xl.git
-cd mini-xl
-
-# Install dependencies
-make setup
-# — or manually:
-pip install openpyxl
+pip install git+https://github.com/HackerCompagnion7/mini-xl.git
 ```
 
-> **Full installation guide with Termux setup**: See [INSTALL.md](INSTALL.md)
-
-### Run
+### From Source
 
 ```bash
-make run
-# — or:
-python3 main.py
+git clone https://github.com/HackerCompagnion7/mini-xl.git
+cd mini-xl
+pip install .
+```
+
+### From Local Wheel
+
+```bash
+pip install mini_xl-2.0.0-py3-none-any.whl
+```
+
+### Verify Installation
+
+```bash
+mini-xl --version    # or just: mini-xl
+pip show mini-xl     # package info
+```
+
+> **Full Termux/Linux/macOS installation guide**: See [INSTALL.md](INSTALL.md)
+
+---
+
+## Getting Started
+
+After installation, simply run:
+
+```bash
+mini-xl
+```
+
+Or via Python:
+
+```bash
+python -m mini_xl
 ```
 
 ---
@@ -89,8 +107,6 @@ python3 main.py
 ## Usage
 
 ### Interactive Mode (Default)
-
-Simply run `mini-xl` and follow the prompts:
 
 ```
 ==================================================
@@ -107,10 +123,10 @@ Simply run `mini-xl` and follow the prompts:
 
   [0]  Quit
 
-  Your choice : 1
+  Your choice: 1
 
-  ✔ Conversion successful!
-  📄 File: /data/storage/downloads/rapport_ventes_20260609_154530.xlsx
+  Conversion successful!
+  File: /data/storage/downloads/rapport_ventes_20260609_154530.xlsx
 ```
 
 ### Workflow
@@ -145,9 +161,9 @@ Cahier;4.80;50
 
 #### TSV (Tab-separated)
 ```tsv
-nom     age     ville   score
-Alice   27      London  95
-Bob     34      Berlin  87
+nom	age	ville	score
+Alice	27	London	95
+Bob	34	Berlin	87
 ```
 
 #### JSON (Array of objects only)
@@ -172,15 +188,25 @@ Must have at least 2 lines with a consistent, detectable separator (`,`, `;`, or
 
 ```
 mini-xl/
-├── main.py          # CLI entry point — orchestrates the pipeline
-├── scanner.py       # Directory scanning — detects compatible files
-├── menu.py          # Interactive menu — user selection & confirmation
-├── analyseur.py     # File analysis — parsing, separator & header detection
-├── generateur.py    # Excel generation — formatting, styling, output
-├── utils.py         # Shared utilities — timestamps, validation, logging
-├── Makefile         # Build automation — install, test, lint, clean
-├── test_mini_xl.py  # Test suite — 34 automated tests
-└── logo.png         # Project logo
+├── src/mini_xl/         # Installable Python package
+│   ├── __init__.py      # Package metadata (version, author)
+│   ├── __main__.py      # python -m mini_xl support
+│   ├── main.py          # CLI entry point — orchestrates the pipeline
+│   ├── scanner.py       # Directory scanning — detects compatible files
+│   ├── menu.py          # Interactive menu — user selection & confirmation
+│   ├── analyseur.py     # File analysis — parsing, separator & header detection
+│   ├── generateur.py    # Excel generation — formatting, styling, output
+│   ├── utils.py         # Shared utilities — timestamps, validation, logging
+│   └── py.typed         # PEP 561 type marker
+├── tests/               # Test suite
+│   └── test_mini_xl.py  # 30 automated tests
+├── dist/                # Built distributions (wheel + sdist)
+├── pyproject.toml       # Package configuration & build system
+├── Makefile             # Build automation
+├── README.md            # This file
+├── INSTALL.md           # Installation guide
+├── LICENSE              # MIT License
+└── logo.png             # Project logo
 ```
 
 ### Module Responsibilities
@@ -192,7 +218,7 @@ mini-xl/
 | `analyseur.py` | File path | Headers + Data + Detected type |
 | `generateur.py` | Headers + Data | Formatted `.xlsx` file |
 | `utils.py` | — | Shared helpers (timestamps, validation, logging) |
-| `main.py` | — | Pipeline orchestration |
+| `main.py` | — | Pipeline orchestration (CLI entry point) |
 
 ### Design Constraints
 
@@ -209,16 +235,19 @@ mini-xl/
 ## Makefile Commands
 
 ```bash
-make help       # Show all available commands
-make setup      # Full setup (install deps + verify compilation)
-make install    # Install openpyxl dependency
-make run        # Launch MINI-XL
-make test       # Run the test suite (34 tests)
-make compile    # Verify all modules compile
-make lint       # Static analysis with pyflakes
-make check      # Full verification (compile + lint + test)
-make clean      # Remove cache and temporary files
-make info       # Display project info and versions
+make help          # Show all available commands
+make setup         # Full setup (install editable + verify)
+make install       # Install the package
+make install-dev   # Install in editable/development mode
+make install-github # Install from GitHub
+make run           # Launch MINI-XL
+make test          # Run the test suite (30 tests)
+make compile       # Verify all modules compile
+make lint          # Static analysis with pyflakes
+make check         # Full verification (compile + lint + test)
+make build         # Build wheel (.whl) and source distribution (.tar.gz)
+make clean         # Remove cache and temporary files
+make info          # Display project info and versions
 ```
 
 ---
@@ -245,10 +274,6 @@ Output:  rapport_ventes_20260608_154530.xlsx
               ↑ cleaned      ↑ timestamp
 ```
 
-- Spaces → underscores
-- Special characters removed
-- Timestamp format: `YYYYMMDD_HHMMSS`
-
 ---
 
 ## Error Handling
@@ -256,9 +281,9 @@ Output:  rapport_ventes_20260608_154530.xlsx
 | Situation | Message |
 |-----------|---------|
 | Empty directory | `No compatible files found` |
-| Empty file | `File empty` |
+| Empty file | `Empty file` |
 | Invalid JSON | `Invalid JSON format` |
-| Non-tabular JSON | `JSON invalid: array of objects expected` |
+| Non-tabular JSON | `Invalid JSON: array of objects expected` |
 | Permission denied | `Permission denied` |
 | File > 100 MB | `Warning: file of X.X MB (recommended limit: 100 MB)` |
 | Unexpected error | Logged to `mini-xl.log` + user message |

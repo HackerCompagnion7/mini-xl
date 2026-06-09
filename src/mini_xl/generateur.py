@@ -1,4 +1,4 @@
-"""MINI-XL v2.0 - Générateur Excel professionnel."""
+"""MINI-XL v2.0 - Professional Excel generator."""
 
 import logging
 from pathlib import Path
@@ -23,12 +23,12 @@ BORDURE = Border(
 
 def generer_xlsx(
     en_tetes: list[str], donnees: list[list[str]],
-    chemin_sortie: Path, nom_feuille: str = "Donnees",
+    chemin_sortie: Path, nom_feuille: str = "Data",
     logger: Optional[logging.Logger] = None,
 ) -> Path:
-    """Génère un fichier Excel professionnel avec mise en forme."""
+    """Generate a professionally formatted Excel file."""
     if not en_tetes or any(not h.strip() for h in en_tetes):
-        raise ValueError("En-têtes invalides ou vides")
+        raise ValueError("Invalid or empty headers")
 
     wb = Workbook()
     ws = wb.active
@@ -41,12 +41,12 @@ def generer_xlsx(
     ws.freeze_panes = "A2"
 
     wb.save(str(chemin_sortie))
-    _log(logger, f"Excel généré : {chemin_sortie} ({len(donnees)} lignes)")
+    _log(logger, f"Excel generated: {chemin_sortie} ({len(donnees)} rows)")
     return chemin_sortie
 
 
 def _ecrire_en_tetes(ws: object, en_tetes: list[str]) -> None:
-    """Écrit la ligne d'en-tête en gras sur fond coloré."""
+    """Write the header row with bold colored style."""
     police = Font(
         name=POLICE_EN_TETE, size=TAILLE_EN_TETE,
         bold=True, color=COULEUR_TEXTE,
@@ -66,7 +66,7 @@ def _ecrire_en_tetes(ws: object, en_tetes: list[str]) -> None:
 
 
 def _ecrire_donnees(ws: object, donnees: list[list[str]]) -> None:
-    """Écrit les données avec typage automatique."""
+    """Write data rows with automatic type conversion."""
     police = Font(name=POLICE_EN_TETE, size=TAILLE_DONNEES)
     align = Alignment(vertical="center")
 
@@ -79,7 +79,7 @@ def _ecrire_donnees(ws: object, donnees: list[list[str]]) -> None:
 
 
 def _convertir(valeur: str) -> object:
-    """Convertit une chaîne en type naturel (int, float ou str)."""
+    """Convert a string to its natural type (int, float or str)."""
     valeur = valeur.strip()
     if not valeur:
         return ""
@@ -97,7 +97,7 @@ def _convertir(valeur: str) -> object:
 def _ajuster_largeurs(
     ws: object, en_tetes: list[str], donnees: list[list[str]],
 ) -> None:
-    """Ajuste la largeur des colonnes au contenu."""
+    """Adjust column widths to content."""
     for col in range(1, len(en_tetes) + 1):
         lettre = get_column_letter(col)
         largeur = _largeur_colonne(col, en_tetes, donnees)
@@ -107,7 +107,7 @@ def _ajuster_largeurs(
 def _largeur_colonne(
     col: int, en_tetes: list[str], donnees: list[list[str]],
 ) -> float:
-    """Calcule la largeur optimale pour une colonne."""
+    """Calculate optimal width for a column."""
     max_len = len(str(en_tetes[col - 1]))
     for ligne in donnees:
         if col <= len(ligne):
@@ -118,19 +118,19 @@ def _largeur_colonne(
 
 
 def _activer_filtre(ws: object, en_tetes: list[str]) -> None:
-    """Active le filtre automatique sur la ligne d'en-têtes."""
+    """Enable auto-filter on the header row."""
     fin = get_column_letter(len(en_tetes))
     ws.auto_filter.ref = f"A1:{fin}1"
 
 
 def _nettoyer_nom_feuille(nom: str) -> str:
-    """Nettoie le nom de feuille Excel (max 31 car., pas de car. interdits)."""
+    """Clean sheet name (max 31 chars, no forbidden chars)."""
     for car in r"[]:*?/\\.":
         nom = nom.replace(car, "_")
     return nom[:31]
 
 
 def _log(logger: Optional[logging.Logger], msg: str) -> None:
-    """Log si le logger est disponible."""
+    """Log if logger is available."""
     if logger:
         logger.info(msg)

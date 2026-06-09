@@ -1,26 +1,25 @@
-#!/usr/bin/env python3
-"""MINI-XL v2.0 - Point d'entrée principal."""
+"""MINI-XL v2.0 - Main entry point."""
 
 import sys
 import logging
 from pathlib import Path
 from typing import Optional
 
-from utils import (
+from mini_xl.utils import (
     configurer_logging, journaliser, chemin_sortie,
     nettoyer_nom, resoudre_repertoire,
 )
-from scanner import scanner_repertoire, verifier_avertissement_taille
-from menu import (
+from mini_xl.scanner import scanner_repertoire, verifier_avertissement_taille
+from mini_xl.menu import (
     afficher_menu, demander_choix,
     confirmer_en_tetes, afficher_aucun_fichier,
 )
-from analyseur import analyser_fichier, detecter_en_tetes
-from generateur import generer_xlsx
+from mini_xl.analyseur import analyser_fichier, detecter_en_tetes
+from mini_xl.generateur import generer_xlsx
 
 
 def main() -> int:
-    """Point d'entrée principal de MINI-XL."""
+    """Main entry point for MINI-XL."""
     logger = configurer_logging()
     repertoire = _obtenir_repertoire(logger)
     if repertoire is None:
@@ -39,23 +38,23 @@ def main() -> int:
 
     resultat = _traiter_fichier(choisi.chemin, repertoire, logger)
     if resultat:
-        journaliser(logger, choisi.nom, "succès")
+        journaliser(logger, choisi.nom, "success")
         return 0
-    journaliser(logger, choisi.nom, "échec")
+    journaliser(logger, choisi.nom, "failure")
     return 1
 
 
 def _obtenir_repertoire(logger: logging.Logger) -> Optional[Path]:
-    """Résout le répertoire de travail, le crée si nécessaire."""
+    """Resolve working directory, create if needed."""
     repertoire = resoudre_repertoire()
     if not repertoire.exists():
-        print(f"\n  ⚠ Répertoire introuvable : {repertoire}")
-        print("  Création du répertoire...\n")
+        print(f"\n  Directory not found: {repertoire}")
+        print("  Creating directory...\n")
         try:
             repertoire.mkdir(parents=True, exist_ok=True)
         except OSError as e:
-            _erreur(f"Impossible de créer le répertoire : {e}")
-            logger.error(f"Répertoire inaccessible : {repertoire} - {e}")
+            _erreur(f"Cannot create directory: {e}")
+            logger.error(f"Directory inaccessible: {repertoire} - {e}")
             return None
     return repertoire
 
@@ -63,26 +62,26 @@ def _obtenir_repertoire(logger: logging.Logger) -> Optional[Path]:
 def _afficher_avertissements(
     fichiers: list, logger: logging.Logger,
 ) -> None:
-    """Affiche les avertissements de taille de fichiers."""
+    """Display file size warnings."""
     for msg in verifier_avertissement_taille(fichiers, logger):
-        print(f"  ⚠ {msg}")
+        print(f"  {msg}")
 
 
 def _traiter_fichier(
     chemin: Path, repertoire: Path, logger: logging.Logger,
 ) -> bool:
-    """Traite un fichier : analyse → validation → génération Excel."""
+    """Process a file: analyze → validate → generate Excel."""
     try:
         resultat = analyser_fichier(chemin, logger)
     except ValueError as e:
         _erreur(str(e))
         return False
     except OSError as e:
-        _erreur(f"Erreur de lecture : {e}")
+        _erreur(f"Read error: {e}")
         return False
 
     if not resultat.en_tetes:
-        _erreur("Fichier vide ou sans données")
+        _erreur("Empty file or no data")
         return False
 
     en_tetes, donnees = _valider_en_tetes(resultat)
@@ -92,7 +91,7 @@ def _traiter_fichier(
     try:
         generer_xlsx(en_tetes, donnees, chemin_xlsx, nom_feuille, logger)
     except (ValueError, OSError) as e:
-        _erreur(f"Erreur de génération : {e}")
+        _erreur(f"Generation error: {e}")
         return False
 
     _succes(chemin_xlsx)
@@ -102,7 +101,7 @@ def _traiter_fichier(
 def _valider_en_tetes(
     resultat: object,
 ) -> tuple[list[str], list[list[str]]]:
-    """Valide et confirme les en-têtes si nécessaire."""
+    """Validate and confirm headers if necessary."""
     en_tetes = resultat.en_tetes
     donnees = resultat.donnees
     probable = detecter_en_tetes(en_tetes, donnees)
@@ -119,27 +118,11 @@ def _valider_en_tetes(
 
 
 def _erreur(message: str) -> None:
-    """Affiche un message d'erreur."""
-    print(f"\n  ✗ {message}\n")
+    """Display an error message."""
+    print(f"\n  {message}\n")
 
 
 def _succes(chemin: Path) -> None:
-    """Affiche le message de succès avec le chemin du fichier."""
-    print("\n  ✔ Conversion réussie !")
-    print(f"  📄 Fichier : {chemin}\n")
-
-
-if __name__ == "__main__":
-    try:
-        code = main()
-    except KeyboardInterrupt:
-        print("\n\n  Opération interrompue.")
-        code = 1
-    except Exception as e:
-        logging.getLogger("mini-xl").critical(
-            f"Erreur inattendue : {e}", exc_info=True
-        )
-        print(f"\n  ✗ Erreur inattendue : {e}")
-        print("  Consultez le journal pour plus de détails.\n")
-        code = 1
-    sys.exit(code)
+    """Display success message with file path."""
+    print("\n  Conversion successful!")
+    print(f"  File: {chemin}\n")

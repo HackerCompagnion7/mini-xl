@@ -5,3 +5,8 @@ __pycache__/
 *.xlsx
 .DS_Store
 mini-xl.log
+dist/
+build/
+*.egg-info/
+.eggs/
+.pytest_cache/
