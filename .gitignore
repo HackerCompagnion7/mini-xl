@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.pyo
+*.log
+*.xlsx
+.DS_Store
+mini-xl.log

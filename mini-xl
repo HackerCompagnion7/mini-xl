@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# MINI-XL v2.0 — Lanceur CLI
+# Usage : mini-xl
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec python3 "$SCRIPT_DIR/main.py" "$@"
